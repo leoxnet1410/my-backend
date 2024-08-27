@@ -16,6 +16,26 @@ class SalesController < ApplicationController
     end
   end
 
+  def index
+    sales = Sale.includes(:product).all
+  
+    sales_with_product_details = sales.map do |sale|
+      {
+        id: sale.id,
+        product_code: sale.product.code,
+        name: sale.product.name,
+        price: sale.product.price,
+        category: sale.product.category,
+        description: sale.product.description,
+        quantity: sale.quantity,
+        total: (sale.quantity * sale.product.price * (1 - sale.discount / 100)),
+        created_at: sale.created_at
+      }
+    end
+  
+    render json: sales_with_product_details, status: :ok
+  end
+
   private
 
   def sale_params

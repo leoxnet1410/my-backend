@@ -14,8 +14,6 @@ module MyBackend
           headers: :any, 
           methods: [:get, :post, :put, :patch, :delete, :options, :head], 
           credentials: true
-    
-        puts "CORS middleware applied"
       end
     end
   end

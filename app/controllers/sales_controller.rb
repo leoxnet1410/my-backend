@@ -1,9 +1,9 @@
 class SalesController < ApplicationController
   def create
     sale = Sale.new(sale_params)
-    
+
     if sale.save
-      # Descontar la cantidad vendida del producto
+    
       product = sale.product
       product.quantity -= sale.quantity
       if product.save
@@ -17,9 +17,11 @@ class SalesController < ApplicationController
   end
 
   def index
-    sales = Sale.includes(:product).all
+    sales = Sale.includes(:product, :customer).all
   
     sales_with_product_details = sales.map do |sale|
+      total = sale.quantity * sale.product.price - sale.discount  
+  
       {
         id: sale.id,
         product_code: sale.product.code,
@@ -28,7 +30,9 @@ class SalesController < ApplicationController
         category: sale.product.category,
         description: sale.product.description,
         quantity: sale.quantity,
-        total: (sale.quantity * sale.product.price * (1 - sale.discount / 100)),
+        total: total > 0 ? total : 0,  
+        discount: sale.discount,  
+        customer_name: sale.customer ? "#{sale.customer.nombre} #{sale.customer.apellido}" : "No asociado",
         created_at: sale.created_at
       }
     end
@@ -39,6 +43,6 @@ class SalesController < ApplicationController
   private
 
   def sale_params
-    params.require(:sale).permit(:product_id, :quantity, :discount)
+    params.require(:sale).permit(:product_id, :quantity, :discount, :customer_id)
   end
 end

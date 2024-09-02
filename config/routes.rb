@@ -9,6 +9,10 @@ Rails.application.routes.draw do
     route_for(:rails_blob_proxy, blob.signed_id, options)
   end
 
+  # Rutas existentes
   resources :products
   resources :sales, only: [:create, :index]
+
+  # Nuevas rutas para customers
+  resources :customers, only: [:index, :create, :update, :destroy]
 end
